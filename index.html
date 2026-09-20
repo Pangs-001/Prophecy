@@ -1,1 +1,1287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#03050a">
+  <title>时间预言 · 永恒石刻</title>
+  <style>
+    :root {
+      --void: #020307;
+      --void-soft: #060a12;
+      --stone: #0b0e14;
+      --stone-light: #141922;
+      --ink: #dbe1ee;
+      --ink-soft: #a5afc2;
+      --muted: #737e94;
+      --faint: #424b5e;
+      --gold: #c8a66b;
+      --gold-bright: #ead6a6;
+      --gold-dim: rgba(200, 166, 107, 0.24);
+      --ice: #a9c3ee;
+      --line: rgba(185, 204, 238, 0.14);
+      --line-soft: rgba(185, 204, 238, 0.075);
+      --serif: "Cormorant Garamond", "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+      --sans: "Optima", "Avenir Next", "Segoe UI Variable", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --mono: "SFMono-Regular", "Cascadia Code", "Fira Code", Consolas, monospace;
+      --px: 0px;
+      --py: 0px;
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      min-height: 100%;
+      background: var(--void);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100svh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 50% -20%, rgba(88, 119, 183, 0.10), transparent 35%),
+        linear-gradient(180deg, #020307 0%, #050711 48%, #020307 100%);
+      font-family: var(--serif);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, 0.42) 100%),
+        linear-gradient(90deg, rgba(1, 2, 5, 0.35), transparent 18%, transparent 82%, rgba(1, 2, 5, 0.35));
+      mix-blend-mode: multiply;
+    }
+
+    ::selection { color: #090a0d; background: var(--gold-bright); }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #03050a; }
+    ::-webkit-scrollbar-thumb { border: 2px solid #03050a; border-radius: 99px; background: #2f3645; }
+
+    /* Cosmic field */
+    .cosmos {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 46% at 17% 18%, rgba(48, 83, 153, 0.12), transparent 70%),
+        radial-gradient(ellipse 60% 48% at 86% 74%, rgba(96, 54, 137, 0.13), transparent 72%),
+        radial-gradient(ellipse 46% 35% at 54% 48%, rgba(177, 144, 83, 0.055), transparent 74%);
+    }
+
+    .galaxy-band {
+      position: absolute;
+      top: 38%;
+      left: -28%;
+      width: 158%;
+      height: 22vmax;
+      opacity: 0.56;
+      border-radius: 50%;
+      transform: rotate(-20deg) translate3d(var(--px), var(--py), 0);
+      background:
+        radial-gradient(ellipse 52% 18% at 48% 50%, rgba(230, 234, 255, 0.14) 0%, rgba(142, 164, 218, 0.08) 26%, transparent 65%),
+        radial-gradient(ellipse 80% 48% at 55% 50%, rgba(84, 116, 183, 0.11), transparent 70%),
+        linear-gradient(90deg, transparent 2%, rgba(105, 134, 196, 0.04) 20%, rgba(207, 196, 226, 0.10) 49%, rgba(102, 120, 176, 0.04) 76%, transparent 98%);
+      filter: blur(18px) saturate(125%);
+      animation: galaxyBreathe 18s ease-in-out infinite;
+    }
+
+    .galaxy-band::after {
+      content: "";
+      position: absolute;
+      inset: 43% 8%;
+      border-radius: 50%;
+      background: linear-gradient(90deg, transparent, rgba(238, 241, 255, 0.12), transparent);
+      filter: blur(18px);
+    }
+
+    .nebula {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.7;
+      filter: blur(72px);
+      mix-blend-mode: screen;
+      transform: translate3d(var(--px), var(--py), 0);
+      animation: nebulaShift 26s ease-in-out infinite alternate;
+    }
+
+    .nebula-a {
+      top: -14%; left: -8%; width: 48vw; height: 48vw;
+      background: radial-gradient(circle, rgba(36, 72, 139, 0.20), rgba(20, 39, 75, 0.04) 54%, transparent 72%);
+    }
+
+    .nebula-b {
+      right: -15%; bottom: -20%; width: 58vw; height: 58vw;
+      background: radial-gradient(circle, rgba(104, 52, 126, 0.20), rgba(52, 25, 70, 0.04) 56%, transparent 73%);
+      animation-delay: -9s;
+    }
+
+    .nebula-c {
+      top: 24%; right: 15%; width: 24vw; height: 24vw; opacity: 0.42;
+      background: radial-gradient(circle, rgba(173, 135, 77, 0.13), transparent 66%);
+      animation-delay: -16s;
+    }
+
+    .starfield {
+      position: absolute;
+      inset: -12%;
+      opacity: 0.72;
+      transform: translate3d(var(--px), var(--py), 0);
+      background-image:
+        radial-gradient(circle 1px at 12% 18%, rgba(255,255,255,.88) 0 45%, transparent 58%),
+        radial-gradient(circle 1px at 27% 71%, rgba(198,216,255,.78) 0 45%, transparent 58%),
+        radial-gradient(circle 1.4px at 42% 34%, rgba(255,245,220,.82) 0 42%, transparent 58%),
+        radial-gradient(circle 1px at 58% 83%, rgba(255,255,255,.68) 0 45%, transparent 58%),
+        radial-gradient(circle 1.2px at 72% 16%, rgba(198,216,255,.84) 0 42%, transparent 58%),
+        radial-gradient(circle 1px at 86% 56%, rgba(255,255,255,.74) 0 45%, transparent 58%),
+        radial-gradient(circle 1.5px at 94% 31%, rgba(255,235,198,.82) 0 42%, transparent 58%),
+        radial-gradient(circle 1px at 7% 91%, rgba(226,235,255,.66) 0 45%, transparent 58%);
+      background-size: 260px 260px, 310px 310px, 290px 290px, 360px 360px, 330px 330px, 290px 290px, 380px 380px, 320px 320px;
+      animation: starsDrift 90s linear infinite;
+    }
+
+    .starfield.far {
+      opacity: 0.42;
+      filter: blur(0.25px);
+      background-size: 470px 470px, 530px 530px, 510px 510px, 570px 570px, 490px 490px, 610px 610px, 540px 540px, 580px 580px;
+      animation-duration: 150s;
+      animation-direction: reverse;
+    }
+
+    .starfield.near {
+      inset: -20%;
+      opacity: 0.38;
+      transform: scale(1.08) translate3d(var(--px), var(--py), 0);
+      animation-duration: 58s;
+    }
+
+    .orbit {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 96vmax;
+      height: 29vmax;
+      border: 1px solid rgba(151, 177, 224, 0.055);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) rotate(-20deg);
+      box-shadow: 0 0 50px rgba(91, 124, 189, 0.025), inset 0 0 60px rgba(91, 124, 189, 0.022);
+    }
+
+    .orbit::before {
+      content: "";
+      position: absolute;
+      top: 13%; left: 19%;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(230, 220, 184, 0.85);
+      box-shadow: 0 0 18px 4px rgba(210, 180, 112, 0.20);
+    }
+
+    .orbit-b {
+      width: 74vmax; height: 22vmax;
+      transform: translate(-50%, -50%) rotate(37deg);
+      border-color: rgba(151, 177, 224, 0.035);
+    }
+
+    .orbit-b::before {
+      top: 76%; left: 73%; width: 3px; height: 3px;
+      background: rgba(191, 211, 255, 0.75);
+      box-shadow: 0 0 14px 3px rgba(120, 160, 225, 0.16);
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      min-height: 100svh;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px clamp(16px, 4vw, 62px) 54px;
+    }
+
+    .masthead {
+      display: flex;
+      width: min(1120px, 100%);
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 26px;
+      color: var(--muted);
+      font-family: var(--sans);
+      font-size: 0.56rem;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+    }
+
+    .masthead-mark {
+      width: 7px; height: 7px;
+      flex: 0 0 auto;
+      border: 1px solid rgba(200, 166, 107, 0.72);
+      transform: rotate(45deg);
+      box-shadow: 0 0 15px rgba(200, 166, 107, 0.35);
+    }
+
+    .masthead-line {
+      height: 1px; flex: 1;
+      background: linear-gradient(90deg, rgba(185, 204, 238, 0.18), rgba(185, 204, 238, 0.02));
+    }
+
+    .masthead-year {
+      color: #7b8498;
+      font-family: var(--mono);
+      letter-spacing: 0.08em;
+    }
+
+    .stele-wrap { position: relative; width: min(790px, 100%); }
+
+    .stele-aura {
+      position: absolute;
+      inset: -48px -76px;
+      z-index: -1;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at 50% 42%, rgba(95, 129, 195, 0.15), transparent 54%),
+        radial-gradient(ellipse at 50% 80%, rgba(151, 101, 184, 0.10), transparent 60%);
+      filter: blur(34px);
+      animation: auraPulse 9s ease-in-out infinite;
+    }
+
+    .stone-tablet {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: clamp(38px, 5vw, 62px) clamp(22px, 5.6vw, 64px) 42px;
+      border: 1px solid rgba(191, 210, 240, 0.14);
+      border-radius: 190px 190px 18px 18px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.018), transparent 14%, transparent 86%, rgba(255,255,255,0.012)),
+        linear-gradient(180deg, #151a23 0%, #0e1219 17%, #090c12 60%, #080a0f 100%);
+      box-shadow:
+        0 96px 170px -58px rgba(0, 0, 0, 0.98),
+        0 34px 75px -25px rgba(0, 0, 0, 0.92),
+        0 0 0 1px rgba(0, 0, 0, 0.84),
+        0 0 100px rgba(85, 118, 183, 0.10),
+        0 0 190px rgba(104, 72, 146, 0.075),
+        inset 0 1px 0 rgba(238, 244, 255, 0.09),
+        inset 0 -22px 54px rgba(0, 0, 0, 0.42),
+        inset 22px 0 52px rgba(0, 0, 0, 0.20),
+        inset -22px 0 52px rgba(0, 0, 0, 0.23);
+      animation: tabletRise 1.2s cubic-bezier(.2, .78, .2, 1) both;
+    }
+
+    .stone-tablet::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.78;
+      background-image:
+        repeating-linear-gradient(101deg, transparent 0 26px, rgba(255,255,255,0.012) 27px, transparent 29px 68px),
+        radial-gradient(ellipse 54% 22% at 10% 18%, rgba(168, 185, 214, 0.055), transparent 67%),
+        radial-gradient(ellipse 42% 35% at 91% 48%, rgba(0, 0, 0, 0.34), transparent 72%),
+        radial-gradient(ellipse 38% 20% at 51% 100%, rgba(0, 0, 0, 0.46), transparent 75%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.38'/%3E%3C/svg%3E");
+      background-blend-mode: screen, screen, multiply, multiply, soft-light;
+      mix-blend-mode: screen, screen, normal, normal, overlay;
+    }
+
+    .stone-tablet::after {
+      content: "";
+      position: absolute;
+      inset: 13px;
+      z-index: 2;
+      pointer-events: none;
+      border: 1px solid rgba(174, 195, 229, 0.075);
+      border-radius: 176px 176px 12px 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.025), 0 0 0 1px rgba(0,0,0,0.36), 0 0 42px rgba(139, 164, 213, 0.026);
+    }
+
+    .stone-content { position: relative; z-index: 3; }
+
+    .stone-content::before,
+    .stone-content::after {
+      content: "";
+      position: absolute;
+      top: 190px;
+      bottom: 72px;
+      width: 1px;
+      opacity: 0.27;
+      background: linear-gradient(180deg, transparent, rgba(200, 166, 107, 0.58) 18%, rgba(166, 190, 231, 0.25) 52%, rgba(200, 166, 107, 0.45) 82%, transparent);
+      pointer-events: none;
+    }
+
+    .stone-content::before { left: -29px; }
+    .stone-content::after { right: -29px; }
+
+    .title-block {
+      position: relative;
+      margin-bottom: clamp(30px, 5vw, 44px);
+      text-align: center;
+    }
+
+    .sigil {
+      position: relative;
+      display: grid;
+      width: 60px; height: 60px;
+      margin: 0 auto 20px;
+      place-items: center;
+      border: 1px solid rgba(200, 166, 107, 0.42);
+      border-radius: 50%;
+      box-shadow: 0 0 0 7px rgba(200, 166, 107, 0.025), 0 0 34px rgba(200, 166, 107, 0.08), inset 0 0 22px rgba(127, 159, 210, 0.08);
+    }
+
+    .sigil::before {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      border: 1px solid rgba(183, 204, 240, 0.24);
+      border-radius: 50%;
+      border-top-color: rgba(234, 214, 166, 0.76);
+      border-bottom-color: rgba(127, 159, 210, 0.42);
+      transform: rotate(24deg);
+      animation: sigilTurn 20s linear infinite;
+    }
+
+    .sigil::after {
+      content: "";
+      width: 7px; height: 7px;
+      border: 1px solid rgba(234, 214, 166, 0.94);
+      background: rgba(200, 166, 107, 0.18);
+      transform: rotate(45deg);
+      box-shadow: 0 0 8px rgba(234, 214, 166, 0.62), 0 0 24px rgba(168, 193, 236, 0.30);
+      animation: sigilPulse 3.6s ease-in-out infinite;
+    }
+
+    .kicker {
+      margin-bottom: 9px;
+      color: var(--gold);
+      font-family: var(--sans);
+      font-size: 0.64rem;
+      letter-spacing: 0.58em;
+      text-indent: 0.58em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      color: #c9d0dc;
+      font-size: clamp(2rem, 5.4vw, 3.55rem);
+      font-weight: 400;
+      line-height: 1.12;
+      letter-spacing: 0.28em;
+      text-indent: 0.28em;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.055), 0 2px 3px rgba(0,0,0,0.96), 0 0 24px rgba(141, 171, 223, 0.11);
+    }
+
+    h1 .accent {
+      color: #d9c498;
+      text-shadow: 0 1px 0 rgba(255,246,222,0.12), 0 2px 3px rgba(0,0,0,0.98), 0 0 24px rgba(200, 166, 107, 0.18);
+    }
+
+    .subhead {
+      margin-top: 14px;
+      color: #707b91;
+      font-size: clamp(0.69rem, 1.6vw, 0.79rem);
+      letter-spacing: 0.33em;
+      text-indent: 0.33em;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.92);
+    }
+
+    .title-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      width: min(310px, 74%);
+      margin: 23px auto 0;
+    }
+
+    .title-divider span {
+      height: 1px;
+      flex: 1;
+      background: linear-gradient(90deg, transparent, rgba(183, 203, 236, 0.28));
+    }
+
+    .title-divider span:last-child { background: linear-gradient(90deg, rgba(183, 203, 236, 0.28), transparent); }
+
+    .title-divider i {
+      width: 5px; height: 5px;
+      border: 1px solid rgba(200, 166, 107, 0.72);
+      transform: rotate(45deg);
+      box-shadow: 0 0 12px rgba(200, 166, 107, 0.32);
+    }
+
+    .inscription-panel {
+      position: relative;
+      padding: clamp(17px, 3vw, 24px);
+      border: 1px solid rgba(178, 199, 235, 0.12);
+      border-radius: 3px;
+      background:
+        linear-gradient(135deg, rgba(167, 193, 235, 0.026), transparent 26%),
+        linear-gradient(315deg, rgba(200, 166, 107, 0.028), transparent 29%),
+        rgba(3, 5, 9, 0.54);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.028), inset 0 14px 36px rgba(0,0,0,0.23), 0 22px 48px rgba(0,0,0,0.17);
+    }
+
+    .inscription-panel::before {
+      content: "";
+      position: absolute;
+      top: -1px; left: 22px;
+      width: 62px; height: 1px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      box-shadow: 0 0 12px rgba(200, 166, 107, 0.42);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      color: #515c70;
+      font-family: var(--sans);
+      font-size: 0.5rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+    }
+
+    .panel-head span:first-child { color: #7f8ca2; font-family: var(--mono); letter-spacing: 0.16em; }
+    .field + .field { margin-top: 22px; }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: #aab5c8;
+      font-family: var(--sans);
+      font-size: 0.69rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.9);
+    }
+
+    .field-index {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 0.54rem;
+      letter-spacing: 0.08em;
+      opacity: 0.88;
+    }
+
+    textarea,
+    input[type="datetime-local"] {
+      width: 100%;
+      border: 1px solid rgba(172, 193, 229, 0.13);
+      border-radius: 2px;
+      outline: none;
+      color: #d2d9e6;
+      background: linear-gradient(180deg, rgba(0,0,0,0.30), transparent 38%), rgba(4, 6, 11, 0.76);
+      font-family: var(--serif);
+      font-size: 0.98rem;
+      letter-spacing: 0.045em;
+      box-shadow: inset 0 7px 18px rgba(0,0,0,0.48), inset 0 1px 0 rgba(255,255,255,0.018), 0 1px 0 rgba(255,255,255,0.025);
+      transition: border-color .28s ease, box-shadow .28s ease, background-color .28s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    textarea { min-height: 132px; padding: 16px 17px; line-height: 1.82; resize: vertical; }
+    textarea::placeholder { color: #4d586c; font-style: italic; }
+
+    input[type="datetime-local"] { min-height: 54px; padding: 0 16px; color-scheme: dark; cursor: pointer; }
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator { width: 16px; height: 16px; opacity: 0.66; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23c8a66b' stroke-width='1.2'%3E%3Crect x='2.5' y='3.5' width='11' height='10' rx='1'/%3E%3Cpath d='M5 2v3M11 2v3M3 7h10'/%3E%3C/svg%3E") center / contain no-repeat; cursor: pointer; }
+
+    textarea:focus,
+    input[type="datetime-local"]:focus {
+      border-color: rgba(200, 166, 107, 0.48);
+      background-color: rgba(5, 8, 14, 0.88);
+      box-shadow: inset 0 7px 18px rgba(0,0,0,0.50), 0 0 0 2px rgba(200, 166, 107, 0.055), 0 0 28px rgba(119, 154, 220, 0.11);
+    }
+
+    .field-hint {
+      margin-top: 8px;
+      color: #515c70;
+      font-size: 0.65rem;
+      font-style: italic;
+      letter-spacing: 0.08em;
+      line-height: 1.5;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.9);
+    }
+
+    .actions { margin-top: 25px; }
+    button { border: 0; font: inherit; -webkit-tap-highlight-color: transparent; }
+
+    button.primary {
+      position: relative;
+      display: flex;
+      width: 100%;
+      min-height: 63px;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      overflow: hidden;
+      padding: 12px 20px;
+      border: 1px solid rgba(200, 166, 107, 0.46);
+      border-radius: 2px;
+      color: var(--gold-bright);
+      background: radial-gradient(circle at 50% 0%, rgba(218, 188, 128, 0.12), transparent 58%), linear-gradient(180deg, rgba(200,166,107,0.11), rgba(200,166,107,0.028) 38%, rgba(0,0,0,0.24));
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.62), 0 13px 30px rgba(0,0,0,0.34), 0 0 38px rgba(200, 166, 107, 0.055), inset 0 1px 0 rgba(255,240,205,0.13), inset 0 -1px 0 rgba(0,0,0,0.55);
+      cursor: pointer;
+      font-family: var(--sans);
+      letter-spacing: 0.19em;
+      text-transform: uppercase;
+      transition: transform .28s ease, border-color .28s ease, box-shadow .28s ease, background-color .28s ease;
+    }
+
+    button.primary::before {
+      content: "";
+      position: absolute;
+      top: -120%; bottom: -120%; left: -35%;
+      width: 22%;
+      transform: rotate(18deg);
+      background: linear-gradient(90deg, transparent, rgba(255,244,217,0.12), transparent);
+      transition: left .7s cubic-bezier(.2,.7,.2,1);
+    }
+
+    button.primary:hover {
+      border-color: rgba(234, 214, 166, 0.78);
+      background-color: rgba(200, 166, 107, 0.045);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.62), 0 15px 38px rgba(0,0,0,0.40), 0 0 54px rgba(200, 166, 107, 0.115), inset 0 1px 0 rgba(255,240,205,0.19);
+      transform: translateY(-1px);
+    }
+
+    button.primary:hover::before { left: 120%; }
+    button.primary:active { transform: translateY(1px); box-shadow: 0 0 0 1px rgba(0,0,0,0.7), 0 6px 16px rgba(0,0,0,0.42), inset 0 4px 12px rgba(0,0,0,0.38); }
+
+    .btn-symbol {
+      position: relative;
+      display: inline-block;
+      width: 25px; height: 25px;
+      flex: 0 0 auto;
+      border: 1px solid rgba(234, 214, 166, 0.52);
+      border-radius: 50%;
+      box-shadow: 0 0 14px rgba(200, 166, 107, 0.14), inset 0 0 12px rgba(200, 166, 107, 0.06);
+    }
+
+    .btn-symbol::before,
+    .btn-symbol::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      background: rgba(234, 214, 166, 0.90);
+      transform: translate(-50%, -50%);
+    }
+
+    .btn-symbol::before { width: 1px; height: 11px; }
+    .btn-symbol::after { width: 11px; height: 1px; }
+    .btn-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+    .btn-copy strong { font-size: 0.78rem; font-weight: 500; line-height: 1; }
+    .btn-copy small { color: rgba(200, 166, 107, 0.58); font-family: var(--mono); font-size: 0.46rem; letter-spacing: 0.15em; }
+
+    .status {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: baseline;
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-left: 2px solid rgba(200, 166, 107, 0.45);
+      background: linear-gradient(90deg, rgba(200, 166, 107, 0.045), transparent 74%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .status .label {
+      margin: 0;
+      color: #877a62;
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    #statusMessage {
+      color: #8591a6;
+      font-size: 0.72rem;
+      font-style: italic;
+      letter-spacing: 0.08em;
+      line-height: 1.55;
+      text-align: right;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.9);
+    }
+
+    .archive { margin-top: 38px; }
+
+    .archive-heading {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 15px;
+      color: #5d687c;
+      font-family: var(--sans);
+      font-size: 0.54rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+    }
+
+    .archive-heading::before {
+      content: "";
+      width: 5px; height: 5px;
+      border: 1px solid rgba(200, 166, 107, 0.68);
+      transform: rotate(45deg);
+      box-shadow: 0 0 10px rgba(200, 166, 107, 0.24);
+    }
+
+    .archive-heading::after {
+      content: "";
+      height: 1px; flex: 1;
+      background: linear-gradient(90deg, rgba(183, 203, 236, 0.16), transparent);
+    }
+
+    .prophecy-list { display: grid; gap: 14px; }
+
+    .prophecy-item {
+      position: relative;
+      overflow: hidden;
+      padding: 19px;
+      border: 1px solid rgba(177, 198, 234, 0.11);
+      border-radius: 3px;
+      background: linear-gradient(135deg, rgba(169, 195, 239, 0.024), transparent 30%), linear-gradient(315deg, rgba(200, 166, 107, 0.022), transparent 34%), rgba(5, 7, 12, 0.58);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.022), 0 16px 32px rgba(0,0,0,0.16);
+      transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease;
+    }
+
+    .prophecy-item::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 18px;
+      width: 44px; height: 1px;
+      background: linear-gradient(90deg, rgba(183, 203, 236, 0.52), transparent);
+    }
+
+    .prophecy-item.unlocked {
+      border-color: rgba(200, 166, 107, 0.28);
+      background: radial-gradient(circle at 90% 0%, rgba(200, 166, 107, 0.055), transparent 42%), linear-gradient(135deg, rgba(169, 195, 239, 0.028), transparent 35%), rgba(6, 8, 13, 0.68);
+      box-shadow: inset 0 1px 0 rgba(255,240,205,0.035), 0 0 36px rgba(200, 166, 107, 0.055), 0 18px 36px rgba(0,0,0,0.18);
+    }
+
+    .prophecy-item:hover { border-color: rgba(183, 203, 236, 0.21); transform: translateY(-1px); }
+    .prophecy-item.unlocked:hover { border-color: rgba(200, 166, 107, 0.42); }
+
+    .item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 15px;
+    }
+
+    .item-index {
+      color: #909caf;
+      font-family: var(--sans);
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.9);
+    }
+
+    .item-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #657085;
+      font-family: var(--mono);
+      font-size: 0.54rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .item-status::before {
+      content: "";
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #59657a;
+      box-shadow: 0 0 8px rgba(112, 131, 164, 0.35);
+    }
+
+    .item-status.unlocked { color: var(--gold); }
+    .item-status.unlocked::before { border-radius: 0; background: var(--gold-bright); transform: rotate(45deg); box-shadow: 0 0 12px rgba(200, 166, 107, 0.58); }
+
+    .item-times {
+      display: grid;
+      gap: 7px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(178, 199, 235, 0.075);
+    }
+
+    .time-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .time-label { color: #596477; font-family: var(--sans); font-size: 0.58rem; letter-spacing: 0.18em; }
+    .time-value { color: #7e8a9f; font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.08em; }
+    .time-value.gold { color: #bca06e; text-shadow: 0 0 14px rgba(200, 166, 107, 0.18); }
+
+    .item-countdown {
+      margin-top: 18px;
+      color: #cad8f1;
+      font-family: var(--mono);
+      font-size: clamp(1.15rem, 4.8vw, 1.52rem);
+      letter-spacing: 0.10em;
+      text-align: center;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.96), 0 0 24px rgba(129, 165, 228, 0.23);
+    }
+
+    .item-locked {
+      margin-top: 8px;
+      color: #505b70;
+      font-size: 0.68rem;
+      font-style: italic;
+      letter-spacing: 0.15em;
+      text-align: center;
+    }
+
+    .item-text {
+      position: relative;
+      overflow: hidden;
+      margin-top: 17px;
+      padding: 18px 19px;
+      border-left: 2px solid rgba(200, 166, 107, 0.58);
+      background: linear-gradient(90deg, rgba(200, 166, 107, 0.045), transparent 66%), rgba(3, 5, 9, 0.60);
+      color: #ddd2b8;
+      font-size: 1rem;
+      line-height: 1.92;
+      letter-spacing: 0.045em;
+      white-space: pre-wrap;
+      word-break: break-word;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.98), 0 0 22px rgba(200, 166, 107, 0.15);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), inset 0 0 40px rgba(0,0,0,0.24);
+      animation: inscriptionReveal 1.8s cubic-bezier(.2,.72,.2,1) both;
+    }
+
+    .item-text::after {
+      content: "ETERNAL";
+      position: absolute;
+      right: 14px; bottom: 9px;
+      color: rgba(200, 166, 107, 0.15);
+      font-family: var(--sans);
+      font-size: 0.45rem;
+      letter-spacing: 0.28em;
+      pointer-events: none;
+    }
+
+    .item-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 15px; }
+
+    .small-btn {
+      position: relative;
+      padding: 8px 13px;
+      border: 1px solid rgba(177, 198, 234, 0.13);
+      border-radius: 2px;
+      color: #7d899e;
+      background: rgba(7, 10, 16, 0.66);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.022);
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 0.59rem;
+      letter-spacing: 0.16em;
+      transition: color .25s ease, border-color .25s ease, background-color .25s ease, box-shadow .25s ease;
+    }
+
+    .small-btn:hover { color: #c8b07e; border-color: rgba(200, 166, 107, 0.35); background: rgba(200, 166, 107, 0.04); box-shadow: inset 0 1px 0 rgba(255,240,205,0.04), 0 0 22px rgba(200, 166, 107, 0.055); }
+    .small-btn:active { transform: translateY(1px); }
+
+    .empty-tip {
+      padding: 32px 16px;
+      border: 1px dashed rgba(177, 198, 234, 0.11);
+      color: #606c81;
+      text-align: center;
+      font-size: 0.76rem;
+      letter-spacing: 0.22em;
+      line-height: 1.9;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.9);
+    }
+
+    .empty-tip span { color: #465165; font-size: 0.64rem; font-style: italic; letter-spacing: 0.16em; }
+
+    .tablet-footer { margin-top: 34px; padding-top: 18px; border-top: 1px solid rgba(177, 198, 234, 0.085); }
+
+    .lock-note,
+    .footer-note {
+      color: #596477;
+      text-align: center;
+      font-size: 0.62rem;
+      font-style: italic;
+      letter-spacing: 0.12em;
+      line-height: 1.7;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.92);
+    }
+
+    .lock-note { color: #766e60; }
+    .footer-note { margin-top: 8px; color: #414c5f; font-size: 0.56rem; }
+
+    @keyframes galaxyBreathe {
+      0%, 100% { opacity: .42; filter: blur(18px) saturate(118%); }
+      50% { opacity: .66; filter: blur(22px) saturate(136%); }
+    }
+
+    @keyframes nebulaShift {
+      from { transform: translate3d(var(--px), var(--py), 0) scale(1); }
+      to { transform: translate3d(calc(var(--px) * -1), calc(var(--py) * -1), 0) scale(1.08); }
+    }
+
+    @keyframes starsDrift {
+      from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+      to { background-position: 260px 135px, -310px 170px, 290px -145px, -360px -190px, 330px 165px, -290px -130px, 380px 190px, -320px -155px; }
+    }
+
+    @keyframes auraPulse {
+      0%, 100% { opacity: .62; transform: scale(.98); }
+      50% { opacity: .92; transform: scale(1.03); }
+    }
+
+    @keyframes tabletRise {
+      from { transform: translateY(22px) scale(.985); }
+      to { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes sigilTurn { to { transform: rotate(384deg); } }
+
+    @keyframes sigilPulse {
+      0%, 100% { opacity: .62; box-shadow: 0 0 8px rgba(234, 214, 166, 0.48), 0 0 20px rgba(168, 193, 236, 0.22); }
+      50% { opacity: 1; box-shadow: 0 0 13px rgba(234, 214, 166, 0.82), 0 0 34px rgba(168, 193, 236, 0.38); }
+    }
+
+    @keyframes inscriptionReveal {
+      from { opacity: 0; filter: blur(7px); transform: translateY(5px); }
+      to { opacity: 1; filter: blur(0); transform: translateY(0); }
+    }
+
+    @media (max-width: 720px) {
+      .page-shell { padding: 20px 12px 38px; }
+      .masthead { margin-bottom: 17px; font-size: 0.49rem; letter-spacing: 0.24em; }
+      .stele-wrap { width: 100%; }
+      .stele-aura { inset: -22px -20px; }
+      .stone-tablet { padding: 33px 17px 31px; border-radius: 108px 108px 15px 15px; }
+      .stone-tablet::after { inset: 9px; border-radius: 98px 98px 10px 10px; }
+      .stone-content::before, .stone-content::after { display: none; }
+      .sigil { width: 52px; height: 52px; margin-bottom: 17px; }
+      h1 { font-size: clamp(1.75rem, 10vw, 2.55rem); letter-spacing: 0.20em; text-indent: 0.20em; }
+      .kicker { font-size: 0.58rem; letter-spacing: 0.42em; text-indent: 0.42em; }
+      .subhead { font-size: 0.62rem; letter-spacing: 0.21em; text-indent: 0.21em; }
+      .inscription-panel { padding: 16px 14px; }
+      .panel-head { margin-bottom: 19px; }
+      .item-header { align-items: flex-start; flex-direction: column; gap: 7px; }
+      .item-status { align-self: flex-start; }
+      .status { grid-template-columns: 1fr; gap: 5px; }
+      #statusMessage { text-align: left; }
+      .btn-copy small { display: none; }
+    }
+
+    @media (max-width: 390px) {
+      .masthead { gap: 9px; }
+      .stone-tablet { padding-left: 13px; padding-right: 13px; }
+      .title-block { margin-bottom: 27px; }
+      .time-row { align-items: flex-start; flex-direction: column; gap: 3px; }
+      .item-countdown { font-size: 1rem; letter-spacing: 0.06em; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cosmos" aria-hidden="true">
+    <div class="nebula nebula-a"></div>
+    <div class="nebula nebula-b"></div>
+    <div class="nebula nebula-c"></div>
+    <div class="galaxy-band"></div>
+    <div class="starfield far"></div>
+    <div class="starfield"></div>
+    <div class="starfield near"></div>
+    <div class="orbit"></div>
+    <div class="orbit orbit-b"></div>
+  </div>
+
+  <div class="page-shell">
+    <header class="masthead">
+      <span class="masthead-mark"></span>
+      <span>The Eternal Inscription</span>
+      <span class="masthead-line"></span>
+      <span class="masthead-year">∞ / 01</span>
+    </header>
+
+    <main class="stele-wrap">
+      <div class="stele-aura"></div>
+
+      <article class="stone-tablet">
+        <div class="stone-content">
+          <header class="title-block">
+            <div class="sigil" aria-hidden="true"></div>
+            <p class="kicker">Time Prophecy</p>
+            <h1>时间<span class="accent">预言</span></h1>
+            <p class="subhead">刻于星河 · 封于石中 · 待时显现</p>
+            <div class="title-divider" aria-hidden="true"><span></span><i></i><span></span></div>
+          </header>
+
+          <section class="inscription-panel" aria-label="创建预言">
+            <div class="panel-head">
+              <span>CREATE / 01</span>
+              <span>宇宙铭文</span>
+            </div>
+
+            <div class="field">
+              <label for="prophecyInput"><span class="field-index">01</span>写下你的预言</label>
+              <textarea id="prophecyInput" placeholder="在此刻下你想对未来说的话……"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="unlockTimeInput"><span class="field-index">02</span>解除封印的时刻</label>
+              <input type="datetime-local" id="unlockTimeInput" step="60">
+              <p class="field-hint">若系统时间控件不便操作，可直接点选并手动修改数字。</p>
+            </div>
+
+            <div class="actions">
+              <button class="primary" id="lockBtn" type="button">
+                <span class="btn-symbol" aria-hidden="true"></span>
+                <span class="btn-copy">
+                  <strong>封印预言</strong>
+                  <small>Seal This Moment</small>
+                </span>
+              </button>
+            </div>
+          </section>
+
+          <section class="status" aria-live="polite">
+            <div class="label">封印状态</div>
+            <div id="statusMessage">等待第一条预言被刻下……</div>
+          </section>
+
+          <section class="archive" aria-label="预言列表">
+            <div class="archive-heading"><span>石刻档案</span></div>
+            <div class="prophecy-list" id="prophecyList"></div>
+          </section>
+
+          <footer class="tablet-footer">
+            <div class="lock-note">预言一经封印，便无法删除、无法修改。唯有时间能解开它。</div>
+            <div class="footer-note">所有预言保存在本机浏览器 · 分享链接才会同步给别人</div>
+          </footer>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>(function() {
+      const XOR_KEY = 0xAB;
+      const STORAGE_KEY = 'time_prophecies_eternal_v1';
+
+      // ---------- DOM ----------
+      const prophecyInput = document.getElementById('prophecyInput');
+      const unlockTimeInput = document.getElementById('unlockTimeInput');
+      const lockBtn = document.getElementById('lockBtn');
+      const statusMessage = document.getElementById('statusMessage');
+      const prophecyList = document.getElementById('prophecyList');
+
+      let countdownIntervals = {};
+
+      // ---------- 编码/解码 ----------
+      function xorString(str, key) {
+        let result = '';
+        for (let i = 0; i < str.length; i++) {
+          result += String.fromCharCode(str.charCodeAt(i) ^ key);
+        }
+        return result;
+      }
+
+      function encodeProphecy(text, unlockTimestamp, createdAt) {
+        const pack = unlockTimestamp + '|' + createdAt + '|' + text;
+        return btoa(unescape(encodeURIComponent(xorString(pack, XOR_KEY))));
+      }
+
+      function decodeProphecy(encoded) {
+        try {
+          const xored = decodeURIComponent(escape(atob(encoded)));
+          const pack = xorString(xored, XOR_KEY);
+          const parts = pack.split('|');
+          if (parts.length < 3) return null;
+          const unlockTimestamp = parseInt(parts[0], 10);
+          const createdAt = parseInt(parts[1], 10);
+          const text = parts.slice(2).join('|');
+          if (isNaN(unlockTimestamp) || isNaN(createdAt)) return null;
+          return { text, unlockTimestamp, createdAt };
+        } catch (e) { return null; }
+      }
+
+      // ---------- 存储 ----------
+      function loadProphecies() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return [];
+          const arr = JSON.parse(raw);
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+      }
+
+      function saveProphecies(list) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      }
+
+      // ---------- 解析时间 ----------
+      function parseDatetimeLocal(value) {
+        if (!value) return null;
+        const m = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
+        if (!m) return null;
+        const year = parseInt(m[1], 10);
+        const month = parseInt(m[2], 10) - 1;
+        const day = parseInt(m[3], 10);
+        const hour = parseInt(m[4], 10);
+        const minute = parseInt(m[5], 10);
+        const second = m[6] ? parseInt(m[6], 10) : 0;
+        const d = new Date(year, month, day, hour, minute, second, 0);
+        if (isNaN(d.getTime())) return null;
+        return d;
+      }
+
+      // ---------- 格式化 ----------
+      function formatDate(ts) {
+        const d = new Date(ts);
+        const y = d.getFullYear();
+        const mo = String(d.getMonth() + 1).padStart(2, '0');
+        const da = String(d.getDate()).padStart(2, '0');
+        const h = String(d.getHours()).padStart(2, '0');
+        const mi = String(d.getMinutes()).padStart(2, '0');
+        return `${y}.${mo}.${da} ${h}:${mi}`;
+      }
+
+      function formatRemaining(ms) {
+        if (ms <= 0) return '00:00:00';
+        const totalSec = Math.floor(ms / 1000);
+        const days = Math.floor(totalSec / 86400);
+        const hours = Math.floor((totalSec % 86400) / 3600);
+        const minutes = Math.floor((totalSec % 3600) / 60);
+        const seconds = totalSec % 60;
+        if (days > 0) {
+          return `${days}天 ${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        }
+        return `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+      }
+
+      function setStatus(msg) {
+        statusMessage.textContent = msg;
+      }
+
+      function setDefaultUnlockTime() {
+        const now = new Date();
+        now.setHours(now.getHours() + 1);
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        if (!unlockTimeInput.value) {
+          unlockTimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+      }
+
+      // ---------- 渲染 ----------
+      function renderList() {
+        const list = loadProphecies();
+        Object.values(countdownIntervals).forEach(clearInterval);
+        countdownIntervals = {};
+        prophecyList.innerHTML = '';
+
+        if (list.length === 0) {
+          prophecyList.innerHTML = '<div class="empty-tip">石上无字<br><span>等待第一条预言被刻下</span></div>';
+          return;
+        }
+
+        const now = Date.now();
+
+        list.forEach((item, index) => {
+          const decoded = decodeProphecy(item.encoded);
+          if (!decoded) return;
+
+          const { text, unlockTimestamp, createdAt } = decoded;
+          const unlocked = now >= unlockTimestamp;
+
+          const div = document.createElement('div');
+          div.className = 'prophecy-item' + (unlocked ? ' unlocked' : '');
+
+          // 头部
+          const header = document.createElement('div');
+          header.className = 'item-header';
+          header.innerHTML = `
+            <span class="item-index">石碑 · 第 ${index + 1} 刻</span>
+            <span class="item-status ${unlocked ? 'unlocked' : ''}">
+              ${unlocked ? '已显现' : '封印中'}
+            </span>
+          `;
+          div.appendChild(header);
+
+          // 时间信息
+          const times = document.createElement('div');
+          times.className = 'item-times';
+          times.innerHTML = `
+            <div class="time-row">
+              <span class="time-label">封印于</span>
+              <span class="time-value">${formatDate(createdAt)}</span>
+            </div>
+            <div class="time-row">
+              <span class="time-label">解除于</span>
+              <span class="time-value ${unlocked ? 'gold' : ''}">${formatDate(unlockTimestamp)}</span>
+            </div>
+          `;
+          div.appendChild(times);
+
+          if (unlocked) {
+            const textDiv = document.createElement('div');
+            textDiv.className = 'item-text';
+            textDiv.textContent = text;
+            div.appendChild(textDiv);
+          } else {
+            const cd = document.createElement('div');
+            cd.className = 'item-countdown';
+            cd.id = 'cd-' + item.id;
+            cd.textContent = formatRemaining(unlockTimestamp - now);
+            div.appendChild(cd);
+
+            const lockedTip = document.createElement('div');
+            lockedTip.className = 'item-locked';
+            lockedTip.textContent = '封于石中 · 待时显现……';
+            div.appendChild(lockedTip);
+
+            const interval = setInterval(() => {
+              const remaining = unlockTimestamp - Date.now();
+              const el = document.getElementById('cd-' + item.id);
+              if (!el) return;
+              if (remaining <= 0) {
+                clearInterval(interval);
+                delete countdownIntervals[item.id];
+                renderList();
+                return;
+              }
+              el.textContent = formatRemaining(remaining);
+            }, 1000);
+            countdownIntervals[item.id] = interval;
+          }
+
+          // 分享
+          const actions = document.createElement('div');
+          actions.className = 'item-actions';
+
+          const shareBtn = document.createElement('button');
+          shareBtn.className = 'small-btn';
+          shareBtn.textContent = '生成铭文链接';
+          shareBtn.onclick = () => {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const url = baseUrl + '#lock=' + item.encoded;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(url).then(() => {
+                setStatus('分享链接已复制。对方打开后，需等待同一时刻。');
+                setTimeout(() => setStatus('石上共 ' + loadProphecies().length + ' 条预言。'), 2000);
+              }).catch(() => {
+                prompt('复制失败，请手动复制：', url);
+              });
+            } else {
+              prompt('请手动复制：', url);
+            }
+          };
+          actions.appendChild(shareBtn);
+
+          div.appendChild(actions);
+          prophecyList.appendChild(div);
+        });
+
+        setStatus('石上共 ' + list.length + ' 条预言。');
+      }
+
+      // ---------- 新增 ----------
+      function lockProphecy() {
+        const text = prophecyInput.value.trim();
+        if (!text) { alert('请写下预言内容。'); return; }
+
+        const timeInput = unlockTimeInput.value;
+        if (!timeInput) { alert('请设定解除封印的时刻。'); return; }
+
+        const unlockDate = parseDatetimeLocal(timeInput);
+        if (!unlockDate) {
+          alert('时间格式无法识别，请重新选择。\n\n如果系统弹窗不好用，可以直接点输入框手动改数字。');
+          return;
+        }
+
+        const unlockTimestamp = unlockDate.getTime();
+        const now = Date.now();
+
+        if (unlockTimestamp <= now) {
+          alert('解除封印的时刻必须晚于当前时刻。\n\n当前时间是：' + new Date(now).toLocaleString('zh-CN'));
+          return;
+        }
+
+        const confirmMsg = '预言一旦刻入石碑，将无法删除、无法修改。\n\n确定要封印吗？';
+        if (!confirm(confirmMsg)) {
+          setStatus('已取消封印。');
+          return;
+        }
+
+        const encoded = encodeProphecy(text, unlockTimestamp, now);
+        const list = loadProphecies();
+        list.push({
+          id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+          encoded: encoded
+        });
+        saveProphecies(list);
+
+        prophecyInput.value = '';
+        setDefaultUnlockTime();
+        renderList();
+        setStatus('预言已刻入石碑，不可删除。石上共 ' + list.length + ' 条。');
+      }
+
+      // ---------- 视觉层 ----------
+      const root = document.documentElement;
+      const finePointer = window.matchMedia('(pointer: fine)').matches;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (finePointer && !reduceMotion) {
+        window.addEventListener('pointermove', (event) => {
+          const x = (event.clientX / window.innerWidth - 0.5) * 2;
+          const y = (event.clientY / window.innerHeight - 0.5) * 2;
+          root.style.setProperty('--px', `${(-x * 9).toFixed(2)}px`);
+          root.style.setProperty('--py', `${(-y * 7).toFixed(2)}px`);
+        }, { passive: true });
+      }
+
+      function syncTextareaHeight() {
+        prophecyInput.style.height = 'auto';
+        prophecyInput.style.height = `${Math.min(Math.max(prophecyInput.scrollHeight, 132), 280)}px`;
+      }
+
+      prophecyInput.addEventListener('input', syncTextareaHeight);
+
+      // ---------- 事件 ----------
+      lockBtn.addEventListener('click', lockProphecy);
+
+      window.addEventListener('beforeunload', () => {
+        Object.values(countdownIntervals).forEach(clearInterval);
+      });
+
+      window.addEventListener('load', () => {
+        setDefaultUnlockTime();
+        renderList();
+      });
+
+    })();</script>
+</body>
+</html>
